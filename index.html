@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>测一测｜你的搞钱特质</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23E8924C'/%3E%3Ccircle cx='12' cy='12' r='4' fill='%23FBF6EF'/%3E%3C/svg%3E">
+<style>
+  /* ============ 基础与变量 ============ */
+  :root{
+    --bg:#FBF6EF;
+    --card:#FFFFFF;
+    --ink:#3D2E22;
+    --ink-soft:#7A6655;
+    --line:#EFE3D2;
+    --brand:#E8924C;
+    --brand-deep:#C9742F;
+    --A:#F0A35E;
+    --B:#7FB69A;
+    --C:#E88CA6;
+    --D:#9B8FC9;
+    --E:#6FA8C9;
+    --radius:20px;
+    --shadow:0 10px 30px rgba(93,66,38,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    min-height:100vh;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .wrap{
+    max-width:600px;
+    margin:0 auto;
+    padding:24px 20px 48px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  /* 背景柔光装饰 */
+  .glow{position:fixed;border-radius:50%;filter:blur(60px);opacity:.45;pointer-events:none;z-index:0}
+  .glow.g1{width:260px;height:260px;background:#F7D9B8;top:-80px;left:-60px}
+  .glow.g2{width:240px;height:240px;background:#F6D3DC;bottom:-60px;right:-60px}
+
+  /* ============ 视图通用 ============ */
+  .view{position:relative;z-index:1;flex:1;display:flex;flex-direction:column}
+  .hidden{display:none !important}
+
+  .btn{
+    appearance:none;border:none;cursor:pointer;
+    font-family:inherit;font-size:16px;font-weight:600;
+    color:#fff;background:var(--brand);
+    padding:14px 28px;border-radius:16px;
+    box-shadow:0 8px 20px rgba(232,146,76,.32);
+    transition:transform .15s ease,background .2s ease,box-shadow .2s ease;
+  }
+  .btn:hover{background:var(--brand-deep)}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{
+    background:#fff;color:var(--ink);
+    border:1.5px solid var(--line);box-shadow:none;
+  }
+  .btn.ghost:hover{background:#FBF1E6}
+
+  /* ============ 首页 ============ */
+  #view-start{justify-content:center;align-items:center;text-align:center;gap:22px}
+  .hero-mark{
+    width:96px;height:96px;border-radius:30px;
+    background:linear-gradient(135deg,#F5B877,#E8924C);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:var(--shadow);
+  }
+  .hero-mark svg{width:48px;height:48px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .title{font-size:32px;font-weight:800;letter-spacing:.5px}
+  .title .accent{color:var(--brand-deep)}
+  .subtitle{color:var(--ink-soft);font-size:16px;max-width:340px}
+  .start-meta{display:flex;gap:18px;color:var(--ink-soft);font-size:13px}
+  .start-meta span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--brand)}
+
+  /* ============ 答题页 ============ */
+  .quiz-head{margin-bottom:18px}
+  .progress-row{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--ink-soft);margin-bottom:10px}
+  .progress-row b{color:var(--ink);font-weight:700}
+  .progress-track{height:8px;background:#F0E4D3;border-radius:99px;overflow:hidden}
+  .progress-fill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#F5B877,var(--brand));transition:width .3s ease}
+
+  .q-card{
+    background:var(--card);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:26px 22px;
+    animation:fadeUp .28s ease;
+  }
+  .q-text{font-size:19px;font-weight:700;margin-bottom:22px}
+  .options{display:flex;flex-direction:column;gap:12px}
+  .option{
+    display:flex;align-items:center;gap:12px;
+    width:100%;text-align:left;cursor:pointer;
+    background:#FBF6EF;border:1.5px solid var(--line);
+    border-radius:16px;padding:15px 16px;
+    font-family:inherit;font-size:15.5px;color:var(--ink);
+    transition:transform .15s ease,border-color .2s ease,background .2s ease;
+    min-height:48px;
+  }
+  .option:hover{border-color:var(--brand);background:#FFF4E8}
+  .option:active{transform:scale(.98)}
+  .option .badge{
+    flex:none;width:26px;height:26px;border-radius:9px;
+    background:#F0E4D3;color:var(--ink-soft);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;
+  }
+  .option.selected{border-color:var(--brand);background:#FFF1E2}
+  .option.selected .badge{background:var(--brand);color:#fff}
+  /* 切换过渡期间锁定选项，避免移动端触摸穿透误选下一题 */
+  .options.locked .option{pointer-events:none}
+
+  .quiz-foot{margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .back-link{
+    appearance:none;background:none;border:none;cursor:pointer;
+    font-family:inherit;font-size:14px;color:var(--ink-soft);
+    padding:8px 4px;
+  }
+  .back-link:hover{color:var(--ink)}
+
+  /* ============ 结果页 ============ */
+  #view-result{align-items:center}
+  .result-card{
+    width:100%;background:var(--card);border-radius:24px;
+    box-shadow:var(--shadow);padding:30px 24px;
+    animation:fadeUp .35s ease;
+  }
+  .result-top{text-align:center;margin-bottom:24px}
+  .result-icon{
+    width:84px;height:84px;border-radius:26px;margin:0 auto 16px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .result-icon svg{width:42px;height:42px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .result-kicker{font-size:13px;color:var(--ink-soft);letter-spacing:2px;margin-bottom:6px}
+  .result-name{font-size:28px;font-weight:800}
+  .result-tag{display:inline-block;margin-top:8px;font-size:14px;color:var(--brand-deep);background:#FFF1E2;padding:5px 14px;border-radius:99px}
+
+  .block{margin-top:22px}
+  .block h3{font-size:15px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .block h3 .line{width:18px;height:2px;background:var(--brand);border-radius:2px}
+  .block p{font-size:15px;color:var(--ink-soft)}
+  .block.egg p{background:#FBF6EF;border-radius:14px;padding:14px 16px}
+
+  .slogan{
+    margin-top:24px;text-align:center;
+    font-size:17px;font-weight:700;color:var(--ink);
+    border-top:1px dashed var(--line);padding-top:20px;
+  }
+  .slogan .quote{color:var(--brand-deep)}
+
+  .score-bars{margin-top:24px;display:flex;flex-direction:column;gap:10px}
+  .bar-row{display:flex;align-items:center;gap:10px;font-size:13px}
+  .bar-row .label{flex:none;width:78px;color:var(--ink-soft)}
+  .bar-track{flex:1;height:10px;background:#F3EADA;border-radius:99px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:99px}
+  .bar-row .num{flex:none;width:24px;text-align:right;color:var(--ink-soft)}
+
+  .result-actions{margin-top:26px;display:flex;flex-direction:column;gap:12px;width:100%}
+
+  /* ============ 动效 ============ */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+  }
+
+  /* ============ 响应式 ============ */
+  @media (max-width:480px){
+    .wrap{padding:20px 16px 40px}
+    .title{font-size:26px}
+    .q-text{font-size:17.5px}
+    .result-name{font-size:24px}
+    .hero-mark{width:80px;height:80px;border-radius:26px}
+  }
+</style>
+</head>
+<body>
+<div class="glow g1" aria-hidden="true"></div>
+<div class="glow g2" aria-hidden="true"></div>
+
+<div class="wrap">
+
+  <!-- ===== 视图：首页 ===== -->
+  <section id="view-start" class="view">
+    <div class="hero-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 17l5-6 4 4 5-7 4 5"/>
+        <path d="M3 21h18"/>
+      </svg>
+    </div>
+    <h1 class="title">测一测<span class="accent">｜你的搞钱特质</span></h1>
+    <p class="subtitle">30 道日常小题，看你骨子里是哪种财运人格。不用懂任何理财知识，凭第一反应选就好。</p>
+    <div class="start-meta">
+      <span><i class="dot"></i>共 30 题</span>
+      <span><i class="dot"></i>约 3 分钟</span>
+      <span><i class="dot"></i>可反复重测</span>
+    </div>
+    <button class="btn" id="btn-start">开始测试</button>
+  </section>
+
+  <!-- ===== 视图：答题 ===== -->
+  <section id="view-quiz" class="view hidden">
+    <div class="quiz-head">
+      <div class="progress-row">
+        <span>第 <b id="q-index">1</b> / 30 题</span>
+        <span id="q-percent">3%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <div class="q-card">
+      <p class="q-text" id="q-text"></p>
+      <div class="options" id="options"></div>
+    </div>
+
+    <div class="quiz-foot">
+      <button class="back-link" id="btn-back">← 上一题</button>
+      <button class="btn ghost hidden" id="btn-submit">查看我的搞钱特质</button>
+    </div>
+  </section>
+
+  <!-- ===== 视图：结果 ===== -->
+  <section id="view-result" class="view hidden">
+    <div class="result-card" id="result-card"></div>
+    <div class="result-actions">
+      <button class="btn" id="btn-restart">重新测试</button>
+      <button class="btn ghost" id="btn-copy">复制我的专属 slogan</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ============ 维度定义 ============ */
+/* A 敏锐猎手 · B 稳健筑巢 · C 人脉星机 · D 灵感创想 · E 精算管家 */
+const DIM_META = {
+  A:{name:"敏锐猎手", color:"var(--A)"},
+  B:{name:"稳健筑巢", color:"var(--B)"},
+  C:{name:"人脉星机", color:"var(--C)"},
+  D:{name:"灵感创想", color:"var(--D)"},
+  E:{name:"精算管家", color:"var(--E)"}
+};
+
+/* ============ 题目：全部为生活化场景，选项映射性格维度 ============ */
+const QUESTIONS = [
+  { q:"周末醒来还没起床，你最先做什么？", options:[
+    {t:"刷一圈手机，看有什么新鲜活动或机会", d:"A"},
+    {t:"想想这周没做完的事，顺手列下来", d:"E"},
+    {t:"翻翻群消息，看谁在约局", d:"C"},
+    {t:"脑子里冒出一堆新点子，随手记下来", d:"D"}
+  ]},
+  { q:"朋友喊你凑钱合伙做点小生意，你第一反应是？", options:[
+    {t:"先看这波风口值不值得冲一把", d:"A"},
+    {t:"先问清楚账怎么分、风险怎么担", d:"E"},
+    {t:"这人靠谱，一起干应该不会差", d:"C"},
+    {t:"挺有意思，看看能不能玩出花样", d:"D"}
+  ]},
+  { q:"逛街看到一家没吃过的店排了很长的队，你会？", options:[
+    {t:"立刻排上，怕错过新鲜体验", d:"A"},
+    {t:"先看看评价和性价比，再决定要不要排", d:"E"},
+    {t:"问问同行的朋友想不想一起", d:"C"},
+    {t:"琢磨它装修挺好看，回头拍点内容", d:"D"}
+  ]},
+  { q:"一笔意外的小红包到账，你倾向于？", options:[
+    {t:"拿来抓住一个刚看到的小机会", d:"A"},
+    {t:"先存起来，落袋为安心里踏实", d:"B"},
+    {t:"请身边人喝杯奶茶，攒个好感", d:"C"},
+    {t:"买点能激发灵感的小玩意儿", d:"D"}
+  ]},
+  { q:"工作群里突然有人甩来一个新项目想法，你？", options:[
+    {t:"迅速判断能不能快速落地", d:"A"},
+    {t:"默默记下，先观察一阵再说", d:"B"},
+    {t:"主动接话，帮着牵线合适的人", d:"C"},
+    {t:"开始脑补它最后能做成什么样", d:"D"}
+  ]},
+  { q:"计划一次长途旅行，你的方式更接近？", options:[
+    {t:"订个票就走，路上随机探索", d:"A"},
+    {t:"提前把预算、行程、住宿都安排妥当", d:"E"},
+    {t:"约上合拍的人一起，路上互相照应", d:"C"},
+    {t:"专门挑有独特风景、出片的小众地方", d:"D"}
+  ]},
+  { q:"收到不太熟的人发来的合作邀约，你？", options:[
+    {t:"先看条件有没有足够吸引力", d:"A"},
+    {t:"先核实对方底细和细节再说", d:"E"},
+    {t:"先聊聊，多个朋友多条路", d:"C"},
+    {t:"被概念本身吸引，先好奇细节", d:"D"}
+  ]},
+  { q:"手头一段时间没什么安排，你通常？", options:[
+    {t:"主动找新鲜的事来试一试", d:"A"},
+    {t:"把手头的事做扎实、补上漏洞", d:"B"},
+    {t:"约人见面，维持一下联系", d:"C"},
+    {t:"捣鼓点自己感兴趣的新鲜玩意", d:"D"}
+  ]},
+  { q:"看到促销打折，你的下意识是？", options:[
+    {t:"划算就顺手抓住，别错过", d:"A"},
+    {t:"列进清单，确认真需要再买", d:"E"},
+    {t:"喊上朋友一起拼单", d:"C"},
+    {t:"被好看或有趣的包装打动", d:"D"}
+  ]},
+  { q:"同事或朋友拉你进一个新圈子，你？", options:[
+    {t:"看看圈子里有没有能借势的信息", d:"A"},
+    {t:"先观察大家是怎么运作的", d:"B"},
+    {t:"很快就和大家熟络起来", d:"C"},
+    {t:"留意圈里有没有好玩的玩法", d:"D"}
+  ]},
+  { q:"面对一件拿不准的事，你更相信？", options:[
+    {t:"直觉，先跑起来再说", d:"A"},
+    {t:"慢慢攒经验，时间会给出答案", d:"B"},
+    {t:"找信任的人聊过之后再定", d:"C"},
+    {t:"换个角度想，说不定有新解法", d:"D"}
+  ]},
+  { q:"买大件之前，你的习惯是？", options:[
+    {t:"相中就下手，早买早用", d:"A"},
+    {t:"反复比对性价比和长期耐用度", d:"E"},
+    {t:"问问用过的朋友的意见", d:"C"},
+    {t:"一眼看中设计，就很难放下", d:"D"}
+  ]},
+  { q:"团队里有人提了个不太成熟的点子，你？", options:[
+    {t:"觉得不妨先试个小版本看看", d:"A"},
+    {t:"觉得风险还得再仔细评估", d:"E"},
+    {t:"帮着问问谁能一起搭把手", d:"C"},
+    {t:"顺着这个点子继续发散脑洞", d:"D"}
+  ]},
+  { q:"日常空闲时间，你更愿意？", options:[
+    {t:"逛各种新鲜资讯和现场", d:"A"},
+    {t:"把生活和日程打理得井井有条", d:"E"},
+    {t:"和不同的人聊聊天", d:"C"},
+    {t:"看点美的、有意思的作品", d:"D"}
+  ]},
+  { q:"朋友请你帮忙出个主意，你通常？", options:[
+    {t:"直接给一条最快能走的路", d:"A"},
+    {t:"帮他把长期利弊捋一遍", d:"B"},
+    {t:"帮他牵线认识能帮上忙的人", d:"C"},
+    {t:"提供一个出人意料的新角度", d:"D"}
+  ]},
+  { q:"一个机会看起来又忙乱又没什么规则，你？", options:[
+    {t:"乱中才好抢先卡位", d:"A"},
+    {t:"等规则清晰了再进场", d:"B"},
+    {t:"先看看里头都有哪些人", d:"C"},
+    {t:"觉得这种混沌反而有创造空间", d:"D"}
+  ]},
+  { q:"月底复盘自己这段日子，你最在意？", options:[
+    {t:"有没有抓住什么新机会", d:"A"},
+    {t:"有没有稳稳积累下什么", d:"B"},
+    {t:"有没有维系好重要的关系", d:"C"},
+    {t:"有没有产出新的想法和作品", d:"D"}
+  ]},
+  { q:"身边人描述你，最可能用哪个词？", options:[
+    {t:"反应快、有冲劲", d:"A"},
+    {t:"靠谱、让人放心", d:"B"},
+    {t:"人缘好、路子广", d:"C"},
+    {t:"点子多、有灵气", d:"D"}
+  ]},
+  { q:"收到一笔意料之外的委托，时间很紧，你？", options:[
+    {t:"先接下来，边做边调整", d:"A"},
+    {t:"先把工作量和回报算清楚", d:"E"},
+    {t:"看看能不能拉个伙伴一起扛", d:"C"},
+    {t:"想把它做出点不一样的样子", d:"D"}
+  ]},
+  { q:"刷到一个完全陌生领域的内容，你？", options:[
+    {t:"琢磨里面有没有能钻进去的机会", d:"A"},
+    {t:"存下来，以后慢慢了解", d:"B"},
+    {t:"转发给可能感兴趣的朋友", d:"C"},
+    {t:"被它的形式和创意吸引住", d:"D"}
+  ]},
+  { q:"选一份长期合作关系，你最看重？", options:[
+    {t:"能不能一起抓住增长", d:"A"},
+    {t:"对方是否稳定可靠", d:"B"},
+    {t:"相处是否舒服、彼此信得过", d:"C"},
+    {t:"能不能碰撞出新东西", d:"D"}
+  ]},
+  { q:"东西坏了，或计划临时出岔子，你？", options:[
+    {t:"立刻换个办法顶上", d:"A"},
+    {t:"按预案一步步处理", d:"E"},
+    {t:"喊身边人搭个手", d:"C"},
+    {t:"干脆借机改成另一种玩法", d:"D"}
+  ]},
+  { q:"休息日，你更容易被哪种邀约打动？", options:[
+    {t:"一个没去过的新鲜地方或活动", d:"A"},
+    {t:"在家把休息和安排弄妥帖", d:"B"},
+    {t:"老友聚会叙叙旧", d:"C"},
+    {t:"一个有意思的展或体验", d:"D"}
+  ]},
+  { q:"讨论一个方案，你更关注？", options:[
+    {t:"它能不能快速出结果", d:"A"},
+    {t:"它能不能长久跑下去", d:"B"},
+    {t:"参与的人各自能不能受益", d:"C"},
+    {t:"它有没有独特的记忆点", d:"D"}
+  ]},
+  { q:"你对“省钱”这件事的态度更接近？", options:[
+    {t:"钱是抓机会赚出来的，不是省出来的", d:"A"},
+    {t:"稳稳存住，心里才踏实", d:"B"},
+    {t:"该花在人情往来上的不犹豫", d:"C"},
+    {t:"愿意为审美和热爱买单", d:"D"}
+  ]},
+  { q:"群里有人抛出一个有争议的话题，你？", options:[
+    {t:"先看它背后有没有可借的势", d:"A"},
+    {t:"不掺和，安静观望", d:"B"},
+    {t:"出来缓和气氛、撮合双方", d:"C"},
+    {t:"觉得角度挺新鲜，参与聊聊", d:"D"}
+  ]},
+  { q:"接手一件重复琐碎的事，你？", options:[
+    {t:"想办法找更快的路子", d:"A"},
+    {t:"按步骤把它做规范", d:"E"},
+    {t:"看能不能找人分工协作", d:"C"},
+    {t:"总想给它加点新花样", d:"D"}
+  ]},
+  { q:"一个想法刚冒出来，你通常会？", options:[
+    {t:"马上找机会试一下", d:"A"},
+    {t:"记下来，等条件成熟再说", d:"B"},
+    {t:"先和聊得来的人碰一碰", d:"C"},
+    {t:"继续把它打磨得更有画面感", d:"D"}
+  ]},
+  { q:"面对别人热情推荐的东西，你？", options:[
+    {t:"跟着热度先去看看", d:"A"},
+    {t:"冷静判断适不适合自己", d:"E"},
+    {t:"看是谁推荐的，人情上也给回应", d:"C"},
+    {t:"被推荐里的故事感打动", d:"D"}
+  ]},
+  { q:"想象一年后的自己，你最期待？", options:[
+    {t:"抓住了一波当年没想到的机会", d:"A"},
+    {t:"攒下了实实在在的家底和底气", d:"B"},
+    {t:"身边聚着一群合拍的伙伴", d:"C"},
+    {t:"拿出了几个自己得意的作品", d:"D"}
+  ]}
+];
+
+/* ============ 结果文案 ============ */
+const RESULTS = {
+  A:{
+    name:"敏锐猎手 · 风口捕手型",
+    tag:"机会嗅觉拉满的行动派",
+    icon:"<svg viewBox='0 0 24 24'><path d='M13 2L4 14h6l-1 8 9-12h-6l1-8z'/></svg>",
+    why:"你对环境里的变化天生敏感，人群里刚冒头的动静，你总能先闻到。别人还在犹豫观望，你已经迈出了第一步。你不迷恋绝对的安全感，更相信机会是抢来的、也是试出来的。你的搞钱力，来自反应快、敢行动，以及那种“先上手再说”的直觉。",
+    egg:"你的财运彩蛋是“临场爆发力”——越到慌乱的场面，你越容易超常发挥。平时看着随性，关键节点常常一击命中。小提醒：冲之前花三秒钟看清方向，你的运气会走得更稳。",
+    slogan:"风口刚冒头，你已经在卡位了。"
+  },
+  B:{
+    name:"稳健筑巢 · 长期复利型",
+    tag:"时间站在你这边的积累派",
+    icon:"<svg viewBox='0 0 24 24'><path d='M12 3C7 8 4 12 4 15a8 8 0 0016 0c0-3-3-7-8-12z'/></svg>",
+    why:"你不追求一夜热闹，更相信水滴石穿。账算得清、步走得稳，别人急着追涨，你在默默攒自己的地基。你给人很强的可靠感，钱和机会都愿意流向你这种“守得住、走得远”的人。你的搞钱力，来自耐心、自律和长期主义。",
+    egg:"你的财运彩蛋是“厚积薄发”——早年那些看似不起眼的坚持，会在某个节点悄悄连成一条上坡路。你不是没有爆发力，只是你的爆发需要时间慢慢发酵。",
+    slogan:"慢慢攒下的家底，最扛风浪。"
+  },
+  C:{
+    name:"人脉星机 · 人脉汇流型",
+    tag:"让人愿意把机会带给你的连接派",
+    icon:"<svg viewBox='0 0 24 24'><path d='M21 12a8 8 0 01-8 8H4l2-3a8 8 0 1115-5z'/></svg>",
+    why:"你天生懂得连接人、经营关系，相处舒服、有分寸，让人愿意把好机会带到你面前。你不独占资源，而是让人和人之间流动起来；口碑、信任和圈子，就是你最硬的底牌。你的搞钱力，来自共情、分寸感和那种利他的社交直觉。",
+    egg:"你的财运彩蛋是“贵人缘”——常常在你没刻意争取的时候，有人主动想起你、拉你一把。你的磁场让人放心把事托付给你。小提醒：关系是双向的，记得也主动回向身边人。",
+    slogan:"你走过的地方，都会成为你的路。"
+  },
+  D:{
+    name:"灵感创想 · 创意变现型",
+    tag:"自带辨识度的灵气派",
+    icon:"<svg viewBox='0 0 24 24'><path d='M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0012 3z'/></svg>",
+    why:"你审美在线、脑子活，总能从普通事物里看出新意。你不喜欢流水线式的重复，更愿意把想法、美感和情绪做成别人看得见的东西。你的搞钱力，来自独特视角、表达力，以及那种“别人想不到”的灵气。",
+    egg:"你的财运彩蛋是“记忆点”——你的作品和想法自带辨识度，容易被人记住、被人转发。你的财富往往先从“有人愿意为你的灵感买单”开始。小提醒：把点子真正落下来，它才不只是灵感。",
+    slogan:"你的脑洞，本身就是一份资产。"
+  },
+  E:{
+    name:"精算管家 · 规划操盘型",
+    tag:"心里有一本明白账的把控派",
+    icon:"<svg viewBox='0 0 24 24'><path d='M4 14a8 8 0 0116 0M12 14l4-4M8 18h8'/></svg>",
+    why:"你条理清楚、细节敏感，成本、风险、节奏在你心里都有一本明白账。你不凭感觉下注，习惯先看清再出手；你能把一团乱麻收拾成可执行的计划，是天生让人安心的操盘手。你的搞钱力，来自规划力、细节把控和风险意识。",
+    egg:"你的财运彩蛋是“颗粒度”——别人忽略的小漏洞、小机会，你一眼就能看见。你靠精细化操作，一点点拉开和别人的差距。小提醒：别算得太满，偶尔给意外留一点空间。",
+    slogan:"每一步都算得清，所以走得稳。"
+  }
+};
+
+/* ============ 状态 ============ */
+let current = 0;
+let locked = false;
+let answers = new Array(QUESTIONS.length).fill(null);
+
+const $ = id => document.getElementById(id);
+const views = { start:$("view-start"), quiz:$("view-quiz"), result:$("view-result") };
+
+function showView(name){
+  Object.values(views).forEach(v => v.classList.add("hidden"));
+  views[name].classList.remove("hidden");
+  window.scrollTo({top:0});
+}
+
+/* ============ 答题渲染 ============ */
+function renderQuestion(){
+  const q = QUESTIONS[current];
+  $("q-index").textContent = current + 1;
+  $("q-percent").textContent = Math.round((current / QUESTIONS.length) * 100) + "%";
+  $("progress-fill").style.width = (current / QUESTIONS.length) * 100 + "%";
+  $("q-text").textContent = q.q;
+
+  const box = $("options");
+  box.innerHTML = "";
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "option" + (answers[current] === opt.d ? " selected" : "");
+    btn.innerHTML = '<span class="badge">' + "ABCD"[i] + '</span><span>' + opt.t + '</span>';
+    /* 用 pointerdown 触发并阻止后续合成 click，避免移动端触摸穿透到新题按钮 */
+    btn.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      e.preventDefault();
+      choose(opt.d, btn);
+    });
+    box.appendChild(btn);
+  });
+
+  const isLast = current === QUESTIONS.length - 1;
+  $("btn-submit").classList.toggle("hidden", !(isLast && answers[current]));
+  $("btn-back").style.visibility = current === 0 ? "hidden" : "visible";
+}
+
+function choose(dim, btn){
+  if (locked) return;
+  locked = true;
+  answers[current] = dim;
+  document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+  btn.classList.add("selected");
+  $("options").classList.add("locked");
+
+  const unlock = () => {
+    locked = false;
+    $("options").classList.remove("locked");
+  };
+
+  if (current === QUESTIONS.length - 1){
+    $("btn-submit").classList.remove("hidden");
+    $("progress-fill").style.width = "100%";
+    $("q-percent").textContent = "100%";
+    /* 末题允许稍后改选，短暂解锁 */
+    setTimeout(unlock, 260);
+    return;
+  }
+  /* 短暂反馈后自动进入下一题，渲染完成再解锁 */
+  setTimeout(() => {
+    current++;
+    renderQuestion();
+    unlock();
+  }, 260);
+}
+
+$("btn-back").addEventListener("click", () => {
+  if (locked) return;
+  if (current > 0){ current--; renderQuestion(); }
+});
+
+$("btn-submit").addEventListener("click", () => {
+  if (answers.includes(null)){
+    const missing = answers.findIndex(a => a === null);
+    current = missing; renderQuestion(); return;
+  }
+  showResult();
+});
+
+/* ============ 计分与结果 ============ */
+function calcScores(){
+  const scores = {A:0,B:0,C:0,D:0,E:0};
+  answers.forEach(d => scores[d]++);
+  return scores;
+}
+
+function topDimension(scores){
+  /* 平分时按 A>B>C>D>E 优先级兜底 */
+  return Object.keys(scores).sort((x,y) => scores[y]-scores[x] || x.localeCompare(y))[0];
+}
+
+function showResult(){
+  const scores = calcScores();
+  const key = topDimension(scores);
+  const r = RESULTS[key];
+  const meta = DIM_META[key];
+
+  const bars = Object.keys(DIM_META).map(k => {
+    const pct = Math.round((scores[k] / QUESTIONS.length) * 100);
+    return '<div class="bar-row">' +
+      '<span class="label">' + DIM_META[k].name + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + DIM_META[k].color + '"></div></div>' +
+      '<span class="num">' + scores[k] + '</span></div>';
+  }).join("");
+
+  $("result-card").innerHTML =
+    '<div class="result-top">' +
+      '<div class="result-icon" style="background:' + meta.color + '">' + r.icon + '</div>' +
+      '<div class="result-kicker">你的搞钱特质是</div>' +
+      '<div class="result-name">' + r.name + '</div>' +
+      '<span class="result-tag">' + r.tag + '</span>' +
+    '</div>' +
+    '<div class="block"><h3><span class="line"></span>为什么是你</h3><p>' + r.why + '</p></div>' +
+    '<div class="block egg"><h3><span class="line"></span>你的隐藏彩蛋</h3><p>' + r.egg + '</p></div>' +
+    '<div class="slogan"><span class="quote">「</span>' + r.slogan + '<span class="quote">」</span></div>' +
+    '<div class="score-bars">' + bars + '</div>';
+
+  $("btn-copy").dataset.slogan = r.slogan;
+  showView("result");
+}
+
+/* ============ 操作入口 ============ */
+$("btn-start").addEventListener("click", () => {
+  current = 0;
+  locked = false;
+  answers = new Array(QUESTIONS.length).fill(null);
+  $("options").classList.remove("locked");
+  renderQuestion();
+  showView("quiz");
+});
+
+$("btn-restart").addEventListener("click", () => {
+  current = 0;
+  locked = false;
+  answers = new Array(QUESTIONS.length).fill(null);
+  $("options").classList.remove("locked");
+  showView("start");
+});
+
+$("btn-copy").addEventListener("click", async (e) => {
+  const text = "我的搞钱特质：" + RESULTS[topDimension(calcScores())].name + "——" + e.currentTarget.dataset.slogan + " 你也来测测你的财运特质？";
+  try{
+    await navigator.clipboard.writeText(text);
+    e.currentTarget.textContent = "已复制，去分享吧";
+  }catch(err){
+    /* 剪贴板不可用时降级提示 */
+    e.currentTarget.textContent = "长按文字即可复制";
+  }
+  setTimeout(() => { e.currentTarget.textContent = "复制我的专属 slogan"; }, 1800);
+});
+</script>
+</body>
+</html>
